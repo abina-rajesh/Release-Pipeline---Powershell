@@ -1,0 +1,29 @@
+replace ps.1  (file Name)
+
+param (
+
+    $files,
+    $find,
+    $replace
+
+)
+
+
+
+
+get-childitem $files -recurse           |
+select-object -expandproperty fullname  |
+foreach-object {
+
+    if ( select-string -path $_ -simplematch $find -quiet ) {
+
+        $null = (get-content $_)                        |
+        foreach-object { $_ -replace $find, $replace }  |
+        set-content $_ 
+
+        write-host  $_
+
+    } 
+
+}
+
