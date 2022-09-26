@@ -1,0 +1,58 @@
+Powershell script
+
+param (
+
+    [parameter(mandatory=$true)]
+    [string] $path_parameter,
+
+    [parameter(mandatory=$true)]
+    [string] $path_tag
+
+)
+
+
+
+
+
+
+
+
+$p = get-content -raw -path $path_parameter | convertfrom-json
+$t = get-content -raw -path $path_tag       | convertfrom-json -ashashtable
+
+
+
+
+
+
+
+
+$p.resource_group_admin,
+$p.resource_group_api_container,
+$p.resource_group_api_service,
+$p.resource_group_legacy,
+$p.resource_group_web | foreach-object {
+
+
+    if ( $(az group exists -n $_) -eq $false ) 
+    {
+
+        new-azresourcegroup -name $_ -location $p.location -tag $t
+
+    }
+
+
+}
+
+2. Default. Json
+   {
+    "resource_group_admin":                 "tmc-default-s-tmds-adm",
+    "resource_group_api_container":         "tmc-default-s-qms-api-cnt",
+    "resource_group_api_service":           "tmc-default-s-qms-api-svc",
+    "resource_group_legacy":                "tmc-default-s-tmds-lgc",
+    "resource_group_web":                   "tmc-default-s-qms-web"
+    }
+    
+ Explanation:
+ We have to use release pipeline for above tasks.
+ In release pipeline we have to use variable tab to put path_parameter (default.json) path_iac(ps file)
